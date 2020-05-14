@@ -1,0 +1,70 @@
+<?php
+
+/**
+ * @file
+ * ya_turbo module file.
+ */
+
+
+/**
+ * Implements hook_menu().
+ */
+function ya_turbo_menu() {
+  $items['ya.turbo.xml'] = array(
+    'page callback' => 'turbo_page',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+
+/**
+ * Callback to display rss file.
+ */
+function turbo_page() {
+  $content = _turbo_get_content();
+
+  header('Content-type: application/xml; charset=UTF-8');
+  echo $content;
+  exit;
+}
+
+/**
+ * Helper function to get the content of the rss file.
+ */
+function _turbo_get_content() {
+  $YML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+  <rss xmlns:yandex=\"http://news.yandex.ru\"
+       xmlns:media=\"http://search.yahoo.com/mrss/\"
+       xmlns:turbo=\"http://turbo.yandex.ru\"
+       version=\"2.0\">
+      <channel>
+          <!-- Информация о сайте-источнике -->
+          <title>Чистые технологии</title>
+          <link>https://vypar.ru/</link>
+          <description>Вакуумные выпарные аппараты</description>
+          <language>ru</language>";
+    
+        $output = node_load_multiple(array(), array('type'=> array('articles', 'models', 'news', 'page', 'service'), 'status' => 1));
+        $output = node_view_multiple($output, 'full');
+
+
+
+        foreach ($output['nodes'] as $node) {
+          if ($node['#node']) {
+
+                  $YML .= "
+                  <item turbo=\"true\">
+                    <link>https://vypar.ru/node/".$node['#node']->nid."</link>
+                    <turbo:source>https://vypar.ru/node/".$node['#node']->nid."</turbo:source>
+                    <turbo:topic>".$node['#node']->title."</turbo:topic>
+                    <pubDate>".date("r", $node['#node']->created)."</pubDate>
+                    <turbo:content> <![CDATA[<header><h1>Чистые технологии</h1><h2>".$node['#node']->title."</h2></header>".  render($node) ." ]]></turbo:content>
+                  </item>";
+
+          }
+        }
+  return $YML . '</channel></rss>';
+}

@@ -1,0 +1,13 @@
+name = Yandex.Turbo Custom
+description = "Generates a turbo xml page"
+core = 7.x
+package = Surweb
+files[] = ya_turbo.module
+files[] = ya_turbo.install
+; configure = admin/config/search/ya_turbo
+; Information added by drupal.org packaging script on 2013-02-05
+version = "7.x-1.0"
+core = "7.x"
+project = "ya_turbo"
+datestamp = "1588064744"
+
